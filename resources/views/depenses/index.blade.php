@@ -7,17 +7,46 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            @if (session('success'))
+                <div class="mb-4 p-4 bg-green-100 text-green-800 rounded">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            <div class="mb-4 flex items-center gap-4">
+                <a href="{{ route('depenses.create') }}"
+                   class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700">
+                    + Nouvelle Dépense
+                </a>
+
+                <form method="GET" action="{{ route('depenses.index') }}" class="flex items-center gap-2">
+                    <select name="categorie" onchange="this.form.submit()"
+                            class="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm">
+                        <option value="">Toutes les catégories</option>
+                        @foreach (\App\Enums\CategorieDepense::cases() as $cat)
+                            <option value="{{ $cat->value }}" {{ request('categorie') === $cat->value ? 'selected' : '' }}>
+                                {{ $cat->label() }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @if (request('categorie'))
+                        <a href="{{ route('depenses.index') }}" class="text-sm text-gray-600 hover:underline">Effacer</a>
+                    @endif
+                </form>
+            </div>
+
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
                     <table class="w-full text-sm text-left">
                         <thead class="border-b">
                             <tr>
                                 <th class="px-4 py-2">Libellé</th>
-                                <th class="px-4 py-2">Quantité</th>
+                                <th class="px-4 py-2">Qté</th>
                                 <th class="px-4 py-2">Prix unitaire</th>
                                 <th class="px-4 py-2">Total</th>
                                 <th class="px-4 py-2">Catégorie</th>
                                 <th class="px-4 py-2">Reçu</th>
+                                <th class="px-4 py-2">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -48,10 +77,21 @@
                                             Voir le reçu
                                         </a>
                                     </td>
+                                    <td class="px-4 py-2 space-x-2">
+                                        <a href="{{ route('depenses.edit', $depense) }}"
+                                           class="text-blue-600 hover:underline">Modifier</a>
+                                        <form action="{{ route('depenses.destroy', $depense) }}"
+                                              method="POST" class="inline"
+                                              onsubmit="return confirm('Supprimer cette dépense ?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="text-red-600 hover:underline">Supprimer</button>
+                                        </form>
+                                    </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="px-4 py-8 text-center text-gray-500">
+                                    <td colspan="7" class="px-4 py-8 text-center text-gray-500">
                                         Aucune dépense pour le moment.
                                     </td>
                                 </tr>

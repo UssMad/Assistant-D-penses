@@ -21,7 +21,13 @@ Route::middleware('auth')->group(function () {
     Route::resource('recus', RecuController::class)->except(['edit', 'update']);
 
     Route::get('/depenses', [DepensesController::class, 'index'])->name('depenses.index');
+    Route::get('/depenses/create', [DepensesController::class, 'create'])->name('depenses.create');
+    Route::post('/depenses', [DepensesController::class, 'store'])->name('depenses.store');
+    Route::post('/recus/{recu}/depenses', [DepensesController::class, 'store'])->name('recus.depenses.store');
     Route::get('/depenses/{depense}', [DepensesController::class, 'show'])->name('depenses.show');
+    Route::get('/depenses/{depense}/edit', [DepensesController::class, 'edit'])->name('depenses.edit');
+    Route::put('/depenses/{depense}', [DepensesController::class, 'update'])->name('depenses.update');
+    Route::delete('/depenses/{depense}', [DepensesController::class, 'destroy'])->name('depenses.destroy');
 });
 
 require __DIR__.'/auth.php';

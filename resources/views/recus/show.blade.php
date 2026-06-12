@@ -7,6 +7,12 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            @if (session('success'))
+                <div class="mb-4 p-4 bg-green-100 text-green-800 rounded">
+                    {{ session('success') }}
+                </div>
+            @endif
+
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
                     <div class="mb-4">
@@ -31,7 +37,18 @@
                     </div>
 
                     @if ($recu->statut->value === 'traite')
-                        <h3 class="font-semibold text-lg mb-4">Dépenses extraites</h3>
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-semibold text-lg">Dépenses</h3>
+                            <button onclick="document.getElementById('inline-expense-form').classList.toggle('hidden')"
+                                    class="inline-flex items-center px-3 py-1 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700">
+                                + Ajouter
+                            </button>
+                        </div>
+
+                        <div id="inline-expense-form" class="hidden">
+                            @include('depenses._form_inline', ['recu' => $recu])
+                        </div>
+
                         <table class="w-full text-sm text-left">
                             <thead class="border-b">
                                 <tr>
@@ -39,6 +56,7 @@
                                     <th class="px-4 py-2">Quantité</th>
                                     <th class="px-4 py-2">Prix unitaire</th>
                                     <th class="px-4 py-2">Catégorie</th>
+                                    <th class="px-4 py-2">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -52,10 +70,21 @@
                                                 {{ $depense->categorie->label() }}
                                             </span>
                                         </td>
+                                        <td class="px-4 py-2 space-x-2">
+                                            <a href="{{ route('depenses.edit', $depense) }}"
+                                               class="text-blue-600 hover:underline">Modifier</a>
+                                            <form action="{{ route('depenses.destroy', $depense) }}"
+                                                  method="POST" class="inline"
+                                                  onsubmit="return confirm('Supprimer cette dépense ?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="text-red-600 hover:underline">Supprimer</button>
+                                            </form>
+                                        </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="4" class="px-4 py-4 text-center text-gray-500">
+                                        <td colspan="5" class="px-4 py-4 text-center text-gray-500">
                                             Aucune dépense trouvée.
                                         </td>
                                     </tr>
