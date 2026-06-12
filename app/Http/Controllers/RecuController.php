@@ -2,64 +2,55 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreRecuRequest;
 use App\Models\Recu;
-use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
 class RecuController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(): View
     {
-        //
+        $recus = auth()->user()->recus()
+            ->withCount('depenses')
+            ->latest()
+            ->paginate(15);
+
+        return view('recus.index', compact('recus'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function create(): View
     {
-        //
+        return view('recus.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(StoreRecuRequest $request): RedirectResponse
     {
-        //
+        $recu = auth()->user()->recus()->create([
+            'texte_brut' => $request->validated()['texte_brut'],
+            'statut' => 'en_attente',
+        ]);
+
+        return to_route('recus.index')
+            ->with('success', 'Reçu créé avec succès.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Recu $recu)
+    public function show(Recu $recu): View
     {
-        //
+        $recu = auth()->user()->recus()
+            ->with('depenses')
+            ->findOrFail($recu->id);
+
+        return view('recus.show', compact('recu'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Recu $recu)
+    public function destroy(Recu $recu): RedirectResponse
     {
-        //
-    }
+        $recu = auth()->user()->recus()->findOrFail($recu->id);
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Recu $recu)
-    {
-        //
-    }
+        $recu->delete();
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Recu $recu)
-    {
-        //
+        return to_route('recus.index')
+            ->with('success', 'Reçu supprimé.');
     }
 }

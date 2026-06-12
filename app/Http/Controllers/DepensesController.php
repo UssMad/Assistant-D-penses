@@ -3,63 +3,25 @@
 namespace App\Http\Controllers;
 
 use App\Models\Depenses;
-use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class DepensesController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(): View
     {
-        //
+        $depenses = Depenses::whereHas('recu', function ($q) {
+            $q->where('user_id', auth()->id());
+        })->with('recu')->latest()->paginate(15);
+
+        return view('depenses.index', compact('depenses'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function show(Depenses $depense): View
     {
-        //
-    }
+        $depense = Depenses::whereHas('recu', function ($q) {
+            $q->where('user_id', auth()->id());
+        })->with('recu')->findOrFail($depense->id);
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Depenses $depenses)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Depenses $depenses)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Depenses $depenses)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Depenses $depenses)
-    {
-        //
+        return view('depenses.show', compact('depense'));
     }
 }
