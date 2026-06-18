@@ -7,6 +7,7 @@ use Database\Factories\DepensesFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use function JmesPath\search;
 
 class Depenses extends Model
 {
@@ -31,5 +32,10 @@ class Depenses extends Model
     public function recu(): BelongsTo
     {
         return $this->belongsTo(Recu::class);
+    }
+    
+    public function scopeExpensive($query){
+        return $query->where('prix_unitaire','>',100)
+        ->get();
     }
 }
