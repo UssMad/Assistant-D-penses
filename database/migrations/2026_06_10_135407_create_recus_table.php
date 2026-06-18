@@ -11,14 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('depenses', function (Blueprint $table) {
+        Schema::create('recus', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->decimal('montant', 10, 2)->nullable();
-            $table->string('devise', 3)->default('EUR');
-            $table->dateTime('date_achat')->nullable();
-            $table->string('description')->nullable();
-            $table->string('categorie')->nullable();
+            $table->text('texte_source');
+            $table->enum('statut', ['en_attente', 'traite', 'echoue'])->default('en_attente');
+            $table->json('payload_brut')->nullable();
             $table->timestamps();
         });
     }
@@ -28,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::dropIfExists('recus');
     }
 };
