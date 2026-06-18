@@ -13,11 +13,34 @@
                 </div>
             @endif
 
-            <div class="mb-4">
-                <a href="{{ route('recus.create') }}"
-                   class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700">
-                    + Nouveau Reçu
-                </a>
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <a href="{{ route('recus.create') }}"
+                       class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700">
+                        + Nouveau Reçu
+                    </a>
+                </div>
+
+                <form method="GET" action="{{ route('recus.index') }}" class="flex items-center gap-2">
+                    <input type="text" name="search" value="{{ request('search') }}"
+                           placeholder="Rechercher dans le texte..."
+                           class="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm">
+                    <select name="status"
+                            class="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm">
+                        <option value="">Tous</option>
+                        <option value="en_attente" @selected(request('status') === 'en_attente')>En attente</option>
+                        <option value="traite" @selected(request('status') === 'traite')>Traité</option>
+                        <option value="echoue" @selected(request('status') === 'echoue')>Échoué</option>
+                    </select>
+                    <button type="submit"
+                            class="inline-flex items-center px-3 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700">
+                        Filtrer
+                    </button>
+                    @if (request('search') || request('status'))
+                        <a href="{{ route('recus.index') }}"
+                           class="text-sm text-gray-600 hover:underline">Effacer</a>
+                    @endif
+                </form>
             </div>
 
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
@@ -51,6 +74,8 @@
                                     <td class="px-4 py-2 space-x-2">
                                         <a href="{{ route('recus.show', $recu) }}"
                                            class="text-blue-600 hover:underline">Voir</a>
+                                        <a href="{{ route('recus.edit', $recu) }}"
+                                           class="text-blue-600 hover:underline">Modifier</a>
                                         <form action="{{ route('recus.destroy', $recu) }}"
                                               method="POST"
                                               class="inline"
@@ -65,6 +90,9 @@
                                 <tr>
                                     <td colspan="4" class="px-4 py-8 text-center text-gray-500">
                                         Aucun reçu pour le moment.
+                                        @if (request('search') || request('status'))
+                                            <br><span class="text-xs">Essayez de modifier vos filtres de recherche.</span>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforelse

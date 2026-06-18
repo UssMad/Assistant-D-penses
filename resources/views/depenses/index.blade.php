@@ -13,14 +13,20 @@
                 </div>
             @endif
 
-            <div class="mb-4 flex items-center gap-4">
-                <a href="{{ route('depenses.create') }}"
-                   class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700">
-                    + Nouvelle Dépense
-                </a>
+            <div class="mb-4 flex items-center gap-4 flex-wrap">
+                <div class="flex items-center gap-2">
+                    <a href="{{ route('depenses.create') }}"
+                       class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700">
+                        + Nouvelle Dépense
+                    </a>
+                    <a href="{{ route('depenses.summary') }}"
+                       class="inline-flex items-center px-4 py-2 bg-gray-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-500">
+                        Résumé par catégorie
+                    </a>
+                </div>
 
-                <form method="GET" action="{{ route('depenses.index') }}" class="flex items-center gap-2">
-                    <select name="categorie" onchange="this.form.submit()"
+                <form method="GET" action="{{ route('depenses.index') }}" class="flex items-center gap-2 flex-wrap">
+                    <select name="categorie"
                             class="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm">
                         <option value="">Toutes les catégories</option>
                         @foreach (\App\Enums\CategorieDepense::cases() as $cat)
@@ -29,7 +35,16 @@
                             </option>
                         @endforeach
                     </select>
-                    @if (request('categorie'))
+                    <input type="date" name="date_from" value="{{ request('date_from') }}"
+                           class="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm">
+                    <span class="text-sm text-gray-500">au</span>
+                    <input type="date" name="date_to" value="{{ request('date_to') }}"
+                           class="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm">
+                    <button type="submit"
+                            class="inline-flex items-center px-3 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700">
+                        Filtrer
+                    </button>
+                    @if (request('categorie') || request('date_from') || request('date_to'))
                         <a href="{{ route('depenses.index') }}" class="text-sm text-gray-600 hover:underline">Effacer</a>
                     @endif
                 </form>
@@ -99,8 +114,16 @@
                         </tbody>
                     </table>
 
-                    <div class="mt-4">
-                        {{ $depenses->links() }}
+                    <div class="mt-4 flex items-center justify-between">
+                        <div>
+                            {{ $depenses->links() }}
+                        </div>
+                        @if ($depenses->total() > 0)
+                            <a href="{{ route('depenses.export', request()->only(['categorie', 'date_from', 'date_to'])) }}"
+                               class="inline-flex items-center px-3 py-2 bg-green-700 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-600">
+                                Exporter en CSV
+                            </a>
+                        @endif
                     </div>
                 </div>
             </div>
